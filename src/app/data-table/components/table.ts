@@ -3,6 +3,7 @@ import {
     TemplateRef, ContentChild, ViewChildren, OnInit
 } from '@angular/core';
 import { DataTableColumn } from './column';
+import { DataTableColumnChild } from './column-child';
 import { DataTableRow } from './row';
 import { DataTableParams, RowCallback, DataTableTranslations, defaultTranslations } from './types';
 import { drag } from '../utils/drag';
@@ -40,6 +41,7 @@ export class DataTable implements DataTableParams, OnInit {
 
 
     private _items: any[] = [];
+    columnChildren: DataTableColumnChild[] = [];
 
     @Input() get items() {
         return this._items;
@@ -342,5 +344,17 @@ export class DataTable implements DataTableParams, OnInit {
             return false;
         }
         return true;
+    }
+
+    getColumns(columns) {
+        this.columnChildren = [];
+        columns.forEach(element => {
+            if (element.children && element.children.length) {
+                element.children.forEach(child => {
+                    this.columnChildren.push(child);
+                });
+            }
+        });
+        return columns;
     }
 }

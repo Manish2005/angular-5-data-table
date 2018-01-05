@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { DataTable} from './components/table';
 import { DataTableColumn } from './components/column';
+import { DataTableColumnChild } from './components/column-child';
 import { DataTableRow } from './components/row';
 import { DataTablePagination } from './components/pagination';
 import { DataTableHeader } from './components/header';
@@ -22,10 +23,10 @@ export const DATA_TABLE_DIRECTIVES = [ DataTable, DataTableColumn ];
 @NgModule({
     imports: [ CommonModule, FormsModule ],
     declarations: [
-        DataTable, DataTableColumn,
+        DataTable, DataTableColumn, DataTableColumnChild,
         DataTableRow, DataTablePagination, DataTableHeader,
         PixelConverter, Hide, MinPipe
     ],
-    exports: [ DataTable, DataTableColumn ]
+    exports: [ DataTable, DataTableColumn, DataTableColumnChild ]
 })
 export class DataTableModule { }

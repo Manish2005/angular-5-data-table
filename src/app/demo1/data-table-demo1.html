@@ -2,7 +2,10 @@
   <data-table id="persons-grid" headerTitle="Employees" [items]="items" [itemCount]="itemCount" (reload)="reloadItems($event)"
     (rowClick)="rowClick($event)" (rowDoubleClick)="rowDoubleClick($event)" [rowTooltip]="rowTooltip">
 
-    <data-table-column headerColSpan="2" property="name" header="Name" [sortable]="true"> </data-table-column>
+    <data-table-column headerColSpan="2" property="name" header="Name" [sortable]="true">
+      <data-table-column-child property="name" header="First Name" [sortable]="true"> </data-table-column-child>
+      <data-table-column-child property="date" header="Last Name" [sortable]="true"> </data-table-column-child>
+    </data-table-column>
     <data-table-column property="date" header="Date" [sortable]="true">
       <ng-template #dataTableCell let-item="item">
         <span>{{item.date | date:'yyyy-MM-dd'}}</span>

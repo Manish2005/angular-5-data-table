@@ -5,16 +5,16 @@
       <thead>
         <tr>
           <th [hidden]="!expandColumnVisible" class="expand-column-header">
-            <th [hidden]="!indexColumnVisible" class="index-column-header">
+            <th [attr.rowspan]="columnChildren.length ? '2' : '1'" [hidden]="!indexColumnVisible" class="index-column-header">
               <span [textContent]="indexColumnHeader"></span>
             </th>
             <th [hidden]="!selectColumnVisible" class="select-column-header">
               <input [hidden]="!multiSelect" type="checkbox" [(ngModel)]="selectAllCheckbox" />
             </th>
 
-            <th *ngFor="let column of columns" #th [hidden]="!column.visible" (click)="headerClicked(column, $event)" [class.sortable]="column.sortable"
+            <th *ngFor="let column of getColumns(columns)" #th [hidden]="!column.visible" (click)="headerClicked(column, $event)" [class.sortable]="column.sortable"
               [class.resizable]="column.resizable" [ngClass]="column.styleClassObject" class="column-header" [style.width]="column.width | px"
-              [attr.colspan]="column.headerColSpan">
+              [attr.colspan]="column.headerColSpan" [attr.rowspan]="column.children && column.children.length ? '1': '2'">
               <span *ngIf="!column.headerTemplate" [textContent]="column.header"></span>
               <span *ngIf="column.headerTemplate" [ngTemplateOutlet]="column.headerTemplate" [ngTemplateOutletContext]="{column: column}"></span>
               <span class="column-sort-icon" *ngIf="column.sortable">
@@ -25,6 +25,21 @@
               </span>
               <span *ngIf="column.resizable" class="column-resize-handle" (mousedown)="resizeColumnStart($event, column, th)"></span>
             </th>
+        </tr>
+        <tr *ngIf="columnChildren.length">
+          <th *ngFor="let column of columnChildren" #th [hidden]="!column.visible" (click)="headerClicked(column, $event)" [class.sortable]="column.sortable"
+            [class.resizable]="column.resizable" [ngClass]="column.styleClassObject" class="column-header" [style.width]="column.width | px"
+            [attr.colspan]="column.headerColSpan">
+            <span *ngIf="!column.headerTemplate" [textContent]="column.header"></span>
+            <span *ngIf="column.headerTemplate" [ngTemplateOutlet]="column.headerTemplate" [ngTemplateOutletContext]="{column: column}"></span>
+            <span class="column-sort-icon" *ngIf="column.sortable">
+              <i class="glyphicon glyphicon-sort column-sortable-icon" [hidden]="column.property === sortBy"></i>
+              <span [hidden]="column.property !== sortBy">
+                <i class="glyphicon" [ngClass]="{'glyphicon-triangle-top': !sortAsc, 'glyphicon-triangle-bottom': sortAsc}"></i>
+            </span>
+            </span>
+            <span *ngIf="column.resizable" class="column-resize-handle" (mousedown)="resizeColumnStart($event, column, th)"></span>
+          </th>
         </tr>
       </thead>
 

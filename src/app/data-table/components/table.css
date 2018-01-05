@@ -34,6 +34,8 @@
 
 .column-header {
     position: relative;
+    vertical-align: middle;
+    text-align: center;
 }
 .expand-column-header {
 	width: 50px;

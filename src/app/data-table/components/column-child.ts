@@ -1,13 +1,12 @@
 import { Directive, Input, ContentChild, OnInit, ContentChildren, QueryList, ViewChildren } from '@angular/core';
 import { DataTableRow } from './row';
 import { CellCallback } from './types';
-import { DataTableColumnChild } from "./column-child";
 
 
 @Directive({
-    selector: 'data-table-column'
+    selector: 'data-table-column-child'
 })
-export class DataTableColumn implements OnInit {
+export class DataTableColumnChild implements OnInit {
 
     // init:
     @Input() header: string;
@@ -24,9 +23,8 @@ export class DataTableColumn implements OnInit {
 
     @ContentChild('dataTableCell') cellTemplate;
     @ContentChild('dataTableHeader') headerTemplate;
-    @ContentChildren(DataTableColumnChild) children: QueryList<DataTableColumnChild>;
 
-    private styleClassObject = {}; // for [ngClass]
+    styleClassObject = {}; // for [ngClass]
 
     ngOnInit() {
         this._initCellClass();
@@ -34,7 +32,7 @@ export class DataTableColumn implements OnInit {
 
     getCellColor(row: DataTableRow, index: number) {
         if (this.cellColors !== undefined) {
-            return (<CellCallback>this.cellColors)(row.item, row, this, index);
+            // return (<CellCallback>this.cellColors)(row.item, row, this, index);
         }
     }
 
