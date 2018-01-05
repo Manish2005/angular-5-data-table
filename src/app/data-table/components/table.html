@@ -1,50 +1,49 @@
 <div class="data-table-wrapper">
-    <data-table-header *ngIf="header"></data-table-header>
+  <data-table-header *ngIf="header"></data-table-header>
+  <div class="data-table-box">
+    <table class="table table-condensed table-bordered data-table">
+      <thead>
+        <tr>
+          <th [hidden]="!expandColumnVisible" class="expand-column-header">
+            <th [hidden]="!indexColumnVisible" class="index-column-header">
+              <span [textContent]="indexColumnHeader"></span>
+            </th>
+            <th [hidden]="!selectColumnVisible" class="select-column-header">
+              <input [hidden]="!multiSelect" type="checkbox" [(ngModel)]="selectAllCheckbox" />
+            </th>
 
-    <div class="data-table-box">
-        <table class="table table-condensed table-bordered data-table">
-            <thead>
-                <tr>
-                    <th [hide]="!expandColumnVisible" class="expand-column-header">
-                    <th [hide]="!indexColumnVisible" class="index-column-header">
-                        <span [textContent]="indexColumnHeader"></span>
-                    </th>
-                    <th [hide]="!selectColumnVisible" class="select-column-header">
-                        <input [hide]="!multiSelect" type="checkbox" [(ngModel)]="selectAllCheckbox"/>
-                    </th>
-                    <th *ngFor="let column of columns" #th [hide]="!column.visible" (click)="headerClicked(column, $event)"
-                        [class.sortable]="column.sortable" [class.resizable]="column.resizable"
-                        [ngClass]="column.styleClassObject" class="column-header" [style.width]="column.width | px">
-                        <span *ngIf="!column.headerTemplate" [textContent]="column.header"></span>
-                        <span *ngIf="column.headerTemplate" [ngTemplateOutlet]="column.headerTemplate" [ngTemplateOutletContext]="{column: column}"></span>
-                        <span class="column-sort-icon" *ngIf="column.sortable">
-                            <span class="glyphicon glyphicon-sort column-sortable-icon" [hide]="column.property === sortBy"></span>
-                            <span [hide]="column.property !== sortBy">
-                                <span class="glyphicon glyphicon-triangle-top" [hide]="sortAsc"></span>
-                                <span class="glyphicon glyphicon-triangle-bottom" [hide]="!sortAsc"></span>
-                            </span>
-                        </span>
-                        <span *ngIf="column.resizable" class="column-resize-handle" (mousedown)="resizeColumnStart($event, column, th)"></span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody *ngFor="let item of items; let index=index" class="data-table-row-wrapper"
-                   dataTableRow #row [item]="item" [index]="index" (selectedChange)="onRowSelectChanged(row)">
-            </tbody>
-            <tbody class="substitute-rows" *ngIf="pagination && substituteRows">
-                <tr *ngFor="let item of substituteItems, let index = index"
-                    [class.row-odd]="(index + items.length) % 2 === 0"
-                    [class.row-even]="(index + items.length) % 2 === 1"
-                    >
-                    <td [hide]="!expandColumnVisible"></td>
-                    <td [hide]="!indexColumnVisible">&nbsp;</td>
-                    <td [hide]="!selectColumnVisible"></td>
-                    <td *ngFor="let column of columns" [hide]="!column.visible">
-                </tr>
-            </tbody>
-        </table>
-        <div class="loading-cover" *ngIf="showReloading && reloading"></div>
-    </div>
+            <th *ngFor="let column of columns" #th [hidden]="!column.visible" (click)="headerClicked(column, $event)" [class.sortable]="column.sortable"
+              [class.resizable]="column.resizable" [ngClass]="column.styleClassObject" class="column-header" [style.width]="column.width | px"
+              [attr.colspan]="column.headerColSpan">
+              <span *ngIf="!column.headerTemplate" [textContent]="column.header"></span>
+              <span *ngIf="column.headerTemplate" [ngTemplateOutlet]="column.headerTemplate" [ngTemplateOutletContext]="{column: column}"></span>
+              <span class="column-sort-icon" *ngIf="column.sortable">
+                <i class="glyphicon glyphicon-sort column-sortable-icon" [hidden]="column.property === sortBy"></i>
+                <span [hidden]="column.property !== sortBy">
+                  <i class="glyphicon" [ngClass]="{'glyphicon-triangle-top': !sortAsc, 'glyphicon-triangle-bottom': sortAsc}"></i>
+              </span>
+              </span>
+              <span *ngIf="column.resizable" class="column-resize-handle" (mousedown)="resizeColumnStart($event, column, th)"></span>
+            </th>
+        </tr>
+      </thead>
 
-    <data-table-pagination *ngIf="pagination"></data-table-pagination>
+      <tbody *ngFor="let item of items; let index=index" class="data-table-row-wrapper" dataTableRow #row [item]="item" [index]="index"
+        (selectedChange)="onRowSelectChanged(row)">
+      </tbody>
+
+      <!-- Figure this out -->
+      <tbody class="substitute-rows" *ngIf="pagination && substituteRows">
+        <tr *ngFor="let item of substituteItems, let index = index" [class.row-odd]="(index + items.length) % 2 === 0" [class.row-even]="(index + items.length) % 2 === 1">
+          <td [hidden]="!expandColumnVisible"></td>
+          <td [hidden]="!indexColumnVisible">&nbsp;</td>
+          <td [hidden]="!selectColumnVisible"></td>
+          <td *ngFor="let column of columns" [hidden]="!column.visible"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="loading-cover" *ngIf="showReloading && reloading"></div>
+  </div>
+
+  <data-table-pagination *ngIf="pagination"></data-table-pagination>
 </div>

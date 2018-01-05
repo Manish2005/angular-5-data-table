@@ -14,12 +14,15 @@ export class DataTableRow implements OnDestroy {
     @Input() index: number;
 
     expanded: boolean;
+    _this = this; // FIXME is there no template keyword for this in angular 2?
 
     // row selection:
 
     private _selected: boolean;
 
     @Output() selectedChange = new EventEmitter();
+
+    constructor( @Inject(forwardRef(() => DataTable)) public dataTable: DataTable) { }
 
     get selected() {
         return this._selected;
@@ -47,11 +50,7 @@ export class DataTableRow implements OnDestroy {
         return '';
     }
 
-    constructor(@Inject(forwardRef(() => DataTable)) public dataTable: DataTable) {}
-
     ngOnDestroy() {
         this.selected = false;
     }
-
-    _this = this; // FIXME is there no template keyword for this in angular 2?
 }

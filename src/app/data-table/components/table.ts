@@ -9,33 +9,19 @@ import { drag } from '../utils/drag';
 
 
 @Component({
-  selector: 'data-table',
-  templateUrl: './table.html',
-  styleUrls: ['./table.css']
+    selector: 'data-table',
+    templateUrl: './table.html',
+    styleUrls: ['./table.css']
 })
 export class DataTable implements DataTableParams, OnInit {
 
-    private _items: any[] = [];
-
-    @Input() get items() {
-        return this._items;
-    }
-
-    set items(items: any[]) {
-        this._items = items;
-        this._onReloadFinished();
-    }
-
-    @Input() itemCount: number;
-
     // UI components:
-
     @ContentChildren(DataTableColumn) columns: QueryList<DataTableColumn>;
     @ViewChildren(DataTableRow) rows: QueryList<DataTableRow>;
     @ContentChild('dataTableExpand') expandTemplate: TemplateRef<any>;
 
     // One-time optional bindings with default values:
-
+    @Input() itemCount: number;
     @Input() headerTitle: string;
     @Input() header = true;
     @Input() pagination = true;
@@ -52,19 +38,51 @@ export class DataTable implements DataTableParams, OnInit {
     @Input() autoReload = true;
     @Input() showReloading = false;
 
-    // UI state without input:
 
+    private _items: any[] = [];
+
+    @Input() get items() {
+        return this._items;
+    }
+
+    set items(items: any[]) {
+        this._items = items;
+        this._onReloadFinished();
+    }
+
+    // UI state without input:
     indexColumnVisible: boolean;
     selectColumnVisible: boolean;
     expandColumnVisible: boolean;
 
     // UI state: visible ge/set for the outside with @Input for one-time initial values
-
     private _sortBy: string;
     private _sortAsc = true;
-
     private _offset = 0;
     private _limit = 10;
+
+    // selection:
+    selectedRow: DataTableRow;
+    selectedRows: DataTableRow[] = [];
+
+    private _selectAllCheckbox = false;
+
+    // Reloading:
+    _reloading = false;
+    @Output() reload = new EventEmitter();
+
+    _displayParams = <DataTableParams>{}; // params of the last finished reload
+    _scheduledReload = null;
+
+    // event handlers:
+    @Output() rowClick = new EventEmitter();
+    @Output() rowDoubleClick = new EventEmitter();
+    @Output() headerClick = new EventEmitter();
+    @Output() cellClick = new EventEmitter();
+
+    // column resizing:
+    private _resizeInProgress = false;
+    resizeLimit = 30;
 
     @Input()
     get sortBy() {
@@ -129,7 +147,6 @@ export class DataTable implements DataTableParams, OnInit {
     }
 
     // init
-
     ngOnInit() {
         this._initDefaultValues();
         this._initDefaultClickEvents();
@@ -153,15 +170,10 @@ export class DataTable implements DataTableParams, OnInit {
         }
     }
 
-    // Reloading:
-
-    _reloading = false;
 
     get reloading() {
         return this._reloading;
     }
-
-    @Output() reload = new EventEmitter();
 
     reloadItems() {
         this._reloading = true;
@@ -174,8 +186,6 @@ export class DataTable implements DataTableParams, OnInit {
         this._selectAllCheckbox = false;
         this._reloading = false;
     }
-
-    _displayParams = <DataTableParams>{}; // params of the last finished reload
 
     get displayParams() {
         return this._displayParams;
@@ -190,7 +200,6 @@ export class DataTable implements DataTableParams, OnInit {
         };
     }
 
-    _scheduledReload = null;
 
     // for avoiding cascading reloads if multiple params are set at once:
     _triggerReload() {
@@ -201,13 +210,6 @@ export class DataTable implements DataTableParams, OnInit {
             this.reloadItems();
         });
     }
-
-    // event handlers:
-
-    @Output() rowClick = new EventEmitter();
-    @Output() rowDoubleClick = new EventEmitter();
-    @Output() headerClick = new EventEmitter();
-    @Output() cellClick = new EventEmitter();
 
     rowClicked(row: DataTableRow, event) {
         this.rowClick.emit({ row, event });
@@ -232,7 +234,7 @@ export class DataTable implements DataTableParams, OnInit {
     // functions:
 
     private _getRemoteParameters(): DataTableParams {
-        let params = <DataTableParams>{};
+        const params = <DataTableParams>{};
 
         if (this.sortBy) {
             params.sortBy = this.sortBy;
@@ -247,7 +249,7 @@ export class DataTable implements DataTableParams, OnInit {
 
     private sortColumn(column: DataTableColumn) {
         if (column.sortable) {
-            let ascending = this.sortBy === column.property ? !this.sortAsc : true;
+            const ascending = this.sortBy === column.property ? !this.sortAsc : true;
             this.sort(column.property, ascending);
         }
     }
@@ -269,13 +271,6 @@ export class DataTable implements DataTableParams, OnInit {
         }
     }
 
-    // selection:
-
-    selectedRow: DataTableRow;
-    selectedRows: DataTableRow[] = [];
-
-    private _selectAllCheckbox = false;
-
     get selectAllCheckbox() {
         return this._selectAllCheckbox;
     }
@@ -293,7 +288,7 @@ export class DataTable implements DataTableParams, OnInit {
 
         // maintain the selectedRow(s) view
         if (this.multiSelect) {
-            let index = this.selectedRows.indexOf(row);
+            const index = this.selectedRows.indexOf(row);
             if (row.selected && index < 0) {
                 this.selectedRows.push(row);
             } else if (!row.selected && index >= 0) {
@@ -323,10 +318,6 @@ export class DataTable implements DataTableParams, OnInit {
         return Array.from({ length: this.displayParams.limit - this.items.length });
     }
 
-    // column resizing:
-
-    private _resizeInProgress = false;
-
     private resizeColumnStart(event: MouseEvent, column: DataTableColumn, columnElement: HTMLElement) {
         this._resizeInProgress = true;
 
@@ -339,7 +330,6 @@ export class DataTable implements DataTableParams, OnInit {
         });
     }
 
-    resizeLimit = 30;
 
     private _isResizeInLimit(columnElement: HTMLElement, dx: number) {
         /* This is needed because CSS min-width didn't work on table-layout: fixed.
@@ -348,7 +338,7 @@ export class DataTable implements DataTableParams, OnInit {
          that offsetWidth sometimes contains out-of-date values. */
         if ((dx < 0 && (columnElement.offsetWidth + dx) <= this.resizeLimit) ||
             !columnElement.nextElementSibling || // resizing doesn't make sense for the last visible column
-            (dx >= 0 && ((<HTMLElement> columnElement.nextElementSibling).offsetWidth + dx) <= this.resizeLimit)) {
+            (dx >= 0 && ((<HTMLElement>columnElement.nextElementSibling).offsetWidth + dx) <= this.resizeLimit)) {
             return false;
         }
         return true;

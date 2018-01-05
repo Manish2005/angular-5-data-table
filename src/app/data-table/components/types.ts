@@ -17,7 +17,7 @@ export interface DataTableTranslations {
     paginationRange: string;
 }
 
-export var defaultTranslations = <DataTableTranslations>{
+export let defaultTranslations = <DataTableTranslations>{
     indexColumn: 'index',
     selectColumn: 'select',
     expandColumn: 'expand',
